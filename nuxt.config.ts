@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
+      title: "Malaxaco ™️",
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/moyai.svg' }
       ]
