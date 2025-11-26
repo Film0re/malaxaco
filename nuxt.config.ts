@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     head: {
       title: "Malaxaco ™️",
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/moyai.svg' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/grape.svg' }
       ]
     }
   },
