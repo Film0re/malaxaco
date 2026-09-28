@@ -4,7 +4,7 @@
       href="https://en.wikipedia.org/wiki/Dioscorea_alata"
       target="_blank"
       rel="noopener noreferrer"
-      class="flex h-screen items-center justify-center"
+      class="flex"
     >
       <img
         src="https://www.emoji.family/api/emojis/1f7e3/noto/svg"

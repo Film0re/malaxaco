@@ -4,7 +4,6 @@
       href="https://www.culvers.com/menu/butterburgers/fried-pickle-pub-burger"
       target="_blank"
       rel="noopener noreferrer"
-      class="flex h-screen items-center justify-center"
     >
       <img
         src="https://www.emoji.family/api/emojis/1f952/noto/svg"
