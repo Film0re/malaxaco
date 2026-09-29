@@ -13,7 +13,3 @@
     <GrumpierGrinch class="pt-10" />
   </div>
 </template>
-
-<script setup lang="ts">
-import GrumpierGrinch from "./grumpier-grinch.vue";
-</script>
