@@ -1,0 +1,3 @@
+<template>
+  <UmaOfTheDay></UmaOfTheDay>
+</template>
