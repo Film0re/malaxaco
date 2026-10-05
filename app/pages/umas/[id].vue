@@ -1,3 +1,0 @@
-<template>
-  <UmasCharacter></UmasCharacter>
-</template>
