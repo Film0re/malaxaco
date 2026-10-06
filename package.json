@@ -20,6 +20,8 @@
 	},
 	"devDependencies": {
 		"nitro-cloudflare-dev": "^0.2.2",
+		"oxfmt": "^0.72.0",
+		"oxlint": "^1.87.0",
 		"wrangler": "^4.50.0"
 	}
 }
