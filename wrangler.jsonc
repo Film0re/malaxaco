@@ -9,7 +9,14 @@
 	"pages_build_output_dir": "./dist",
 	"observability": {
 		"enabled": true
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "malaxaco-db",
+			"database_id": "732e6c01-08c9-493c-9da4-16d61b63301e"
+		}
+	]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

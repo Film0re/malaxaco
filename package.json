@@ -9,7 +9,10 @@
 		"preview": "npm run build && wrangler pages dev",
 		"postinstall": "nuxt prepare",
 		"deploy": "npm run build --preset=cloudflare_pages && wrangler pages deploy dist/",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types",
+		"db:schema": "wrangler d1 execute malaxaco-db --local --file=./db/schema.sql",
+		"db:seed": "wrangler d1 execute malaxaco-db --local --file=./db/seed.sql",
+		"db:reset": "rm -rf .wrangler/state && npm run db:schema && npm run db:seed"
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.1.17",
