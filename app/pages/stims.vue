@@ -18,7 +18,8 @@ const stims: Ref<string[]> = ref([
   "Hiberate Jenkins Buttons",
   "Pickle Pub Burger",
   "Ube Potato",
-  "Max Book"
+  "Max Book",
+  "Jimmy"
 ]);
 
 const currentStimText = computed(() => currentStim.value.join(" "));
