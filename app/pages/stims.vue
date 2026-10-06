@@ -1,15 +1,13 @@
 <template>
-  <div class="flex flex-col text-center gap-4">
+  <div class="flex flex-col items-center text-center gap-4">
     <div>{{ currentStimText }} ({{ currentStimAcronym }})</div>
 
-    <div>
-      <button
-        class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-        @click="currentStim = craftNewStim()"
-      >
-        Create New Stim
-      </button>
-    </div>
+    <button
+      class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+      @click="currentStim = craftNewStim()"
+    >
+      Create New Stim
+    </button>
   </div>
 </template>
 <script setup lang="ts">
