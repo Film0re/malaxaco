@@ -1,5 +1,5 @@
 <template>
-  <main class="flex min-h-screen items-center justify-center flex-col gap-4">
+  <main class="flex gap-4 flex-1 flex-col items-center justify-center">
     <div>{{ currentStimText }} ({{ currentStimAcronym }})</div>
 
     <button

@@ -1,5 +1,5 @@
 <template>
-  <main class="flex min-h-screen items-center justify-center flex-col">
+  <main class="flex flex-1 flex-col items-center justify-center">
     <div>
       <a
         href="https://www.costco.com/1-oz-gold-argor-heraeus-kinebar-new-in-assay.product.4000329233.html"
