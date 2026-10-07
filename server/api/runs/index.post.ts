@@ -3,20 +3,10 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
 
   const body = await readBody<CreateRunRequest>(event);
 
-  if (!Array.isArray(body.entries)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "entries must be an array."
-    });
-  }
+  const { entries, error } = validateEntries(body?.entries);
 
-  const entries = body.entries.map((name) => name.trim()).filter(Boolean);
-
-  if (entries.length < 2) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "A run requires at least two entries."
-    });
+  if (error) {
+    throw createError({ statusCode: 400, statusMessage: error });
   }
 
   const run = await db
