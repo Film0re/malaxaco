@@ -2,23 +2,19 @@
 //
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   app: {
     head: {
       title: "Malaxaco ™️",
-      link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/grape.svg' }
-      ]
+      link: [{ rel: "icon", type: "image/svg+xml", href: "/grape.svg" }]
     }
   },
 
   vite: {
-    plugins: [
-      tailwindcss()
-    ]
+    plugins: [tailwindcss()]
   },
-  css: ['./app/assets/css/main.css'],
+  css: ["~/assets/css/main.css"],
 
   nitro: {
     preset: "cloudflare-pages",
@@ -30,4 +26,4 @@ export default defineNuxtConfig({
   },
 
   modules: ["nitro-cloudflare-dev"]
-})
+});
