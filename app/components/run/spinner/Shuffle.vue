@@ -10,8 +10,14 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ entries: Entry[]; targetId: number | null }>();
-const emit = defineEmits<{ done: [] }>();
+const props = defineProps<{
+  entries: Entry[];
+  targetId: number | null;
+}>();
+
+const emit = defineEmits<{
+  done: [];
+}>();
 
 const shown = ref<Entry | null>(null);
 const landed = ref(false);

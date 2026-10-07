@@ -1,20 +1,44 @@
-<template>
-  <div class="flex h-96 flex-col justify-center">
-    <component :is="active" :entries="entries" :target-id="targetId" @done="$emit('done')" />
-  </div>
-</template>
-
 <script setup lang="ts">
+import type { Component } from "vue";
+import { DEFAULT_SPINNER_VARIANT, type SpinnerVariant } from "~/types/spinner";
+
+import Board from "./spinner/Board.vue";
+import Shuffle from "./spinner/Shuffle.vue";
+import Slot from "./spinner/Slot.vue";
+import Wheel from "./spinner/Wheel.vue";
+
 const props = withDefaults(
   defineProps<{
     entries: Entry[];
     targetId: number | null;
-    variant?: SpinnerVariantId;
+    variant?: SpinnerVariant;
   }>(),
-  { variant: DEFAULT_SPINNER_VARIANT }
+  {
+    variant: DEFAULT_SPINNER_VARIANT
+  }
 );
 
-defineEmits<{ done: [] }>();
+const emit = defineEmits<{
+  done: [];
+}>();
 
-const active = computed(() => spinnerVariants[props.variant].component);
+const variants = {
+  shuffle: Shuffle,
+  slot: Slot,
+  wheel: Wheel,
+  board: Board
+} satisfies Record<SpinnerVariant, Component>;
+
+const active = computed(() => variants[props.variant]);
 </script>
+
+<template>
+  <div class="flex h-96 flex-col justify-center">
+    <component
+      :is="active"
+      :entries="props.entries"
+      :target-id="props.targetId"
+      @done="emit('done')"
+    />
+  </div>
+</template>

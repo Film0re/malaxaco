@@ -100,6 +100,6 @@ export default defineEventHandler(async (event): Promise<SpinResult> => {
   return {
     elimination,
     remaining,
-    winner: remaining.length === 1 ? remaining[0] : null
+    winner: remaining.length === 1 ? (remaining[0] ?? null) : null
   };
 });

@@ -22,10 +22,14 @@
 		"vue-router": "^4.6.3"
 	},
 	"devDependencies": {
+		"@golar/vue": "^0.1.10",
+		"@typescript/typescript6": "^6.0.2",
+		"golar": "^0.1.10",
 		"nitro-cloudflare-dev": "^0.2.2",
 		"oxfmt": "^0.72.0",
 		"oxlint": "^1.87.0",
-		"typescript": "^7.0.2",
+		"typescript": "^6.0.3",
+		"vue-tsc": "^3.3.12",
 		"wrangler": "^4.50.0"
 	}
 }

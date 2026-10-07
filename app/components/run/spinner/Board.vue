@@ -18,8 +18,14 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ entries: Entry[]; targetId: number | null }>();
-const emit = defineEmits<{ done: [] }>();
+const props = defineProps<{
+  entries: Entry[];
+  targetId: number | null;
+}>();
+
+const emit = defineEmits<{
+  done: [];
+}>();
 
 const HOPS = 22;
 
@@ -60,7 +66,9 @@ function start(targetId: number) {
       // Never repeat the previous tile, and keep the target out of the
       // final approach so the landing feels like a surprise
       let pool = ids.filter((x) => x !== prev && (i < HOPS - 2 || x !== targetId));
-      if (!pool.length) pool = ids.filter((x) => x !== prev);
+      if (!pool.length) {
+        pool = ids.filter((x) => x !== prev);
+      }
       next = pool[Math.floor(Math.random() * pool.length)]!;
     }
 

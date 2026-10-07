@@ -1,6 +1,40 @@
+<template>
+  <div class="relative h-48 overflow-hidden rounded border bg-gray-50">
+    <div
+      ref="reel"
+      class="will-change-transform"
+      :style="{
+        transform: `translateY(${offset}px)`,
+        transition: animating ? 'transform 4s cubic-bezier(0.12, 0.8, 0.2, 1)' : 'none'
+      }"
+      @transitionend="onTransitionEnd"
+    >
+      <div
+        v-for="(e, i) in strip"
+        :key="i"
+        class="flex h-16 items-center justify-center text-2xl font-bold"
+      >
+        {{ e.name }}
+      </div>
+    </div>
+
+    <!-- Highlight on the middle row -->
+    <div
+      class="pointer-events-none absolute inset-x-0 top-16 h-16 border-y-2 transition-colors"
+      :class="landed ? 'border-red-400 bg-red-200/40' : 'border-gray-400'"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
-const props = defineProps<{ entries: Entry[]; targetId: number | null }>();
-const emit = defineEmits<{ done: [] }>();
+const props = defineProps<{
+  entries: Entry[];
+  targetId: number | null;
+}>();
+
+const emit = defineEmits<{
+  done: [];
+}>();
 
 const ROW = 64; // px, must match h-16 below
 const strip = ref<Entry[]>([]);
@@ -74,31 +108,3 @@ watch(
 
 onBeforeUnmount(() => clearTimeout(timer));
 </script>
-
-<template>
-  <div class="relative h-48 overflow-hidden rounded border bg-gray-50">
-    <div
-      ref="reel"
-      class="will-change-transform"
-      :style="{
-        transform: `translateY(${offset}px)`,
-        transition: animating ? 'transform 4s cubic-bezier(0.12, 0.8, 0.2, 1)' : 'none'
-      }"
-      @transitionend="onTransitionEnd"
-    >
-      <div
-        v-for="(e, i) in strip"
-        :key="i"
-        class="flex h-16 items-center justify-center text-2xl font-bold"
-      >
-        {{ e.name }}
-      </div>
-    </div>
-
-    <!-- Highlight on the middle row -->
-    <div
-      class="pointer-events-none absolute inset-x-0 top-16 h-16 border-y-2 transition-colors"
-      :class="landed ? 'border-red-400 bg-red-200/40' : 'border-gray-400'"
-    />
-  </div>
-</template>

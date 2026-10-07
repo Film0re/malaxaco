@@ -1,6 +1,63 @@
+<template>
+  <div class="flex flex-col items-center gap-3">
+    <div class="relative" :style="{ width: `${SIZE}px`, height: `${SIZE}px` }">
+      <!-- Pointer at 12 o'clock -->
+      <div
+        class="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1"
+        style="
+          width: 0;
+          height: 0;
+          border-left: 12px solid transparent;
+          border-right: 12px solid transparent;
+          border-top: 22px solid #111;
+        "
+      />
+
+      <div
+        ref="wheel"
+        class="will-change-transform"
+        :style="{
+          transform: `rotate(${rotation}deg)`,
+          transition: animating ? 'transform 5s cubic-bezier(0.12, 0.7, 0.15, 1)' : 'none'
+        }"
+        @transitionend="onTransitionEnd"
+      >
+        <svg :viewBox="`0 0 ${SIZE} ${SIZE}`" :width="SIZE" :height="SIZE">
+          <g v-for="s in slices" :key="s.entry.id">
+            <path :d="s.path" :fill="s.color" stroke="white" stroke-width="2" />
+            <text
+              :x="C + R - 14"
+              :y="C"
+              :transform="`rotate(${s.center - 90} ${C} ${C})`"
+              text-anchor="end"
+              dominant-baseline="middle"
+              font-size="15"
+              font-weight="600"
+              fill="#111"
+            >
+              {{ s.label }}
+            </text>
+          </g>
+          <circle :cx="C" :cy="C" r="14" fill="white" stroke="#111" stroke-width="2" />
+        </svg>
+      </div>
+    </div>
+
+    <p class="h-6 font-semibold text-red-700">
+      <template v-if="landed">Eliminated: {{ pickedName }}</template>
+    </p>
+  </div>
+</template>
+
 <script setup lang="ts">
-const props = defineProps<{ entries: Entry[]; targetId: number | null }>();
-const emit = defineEmits<{ done: [] }>();
+const props = defineProps<{
+  entries: Entry[];
+  targetId: number | null;
+}>();
+
+const emit = defineEmits<{
+  done: [];
+}>();
 
 const SIZE = 320;
 const C = SIZE / 2;
@@ -97,54 +154,3 @@ watch(
 
 onBeforeUnmount(() => clearTimeout(timer));
 </script>
-
-<template>
-  <div class="flex flex-col items-center gap-3">
-    <div class="relative" :style="{ width: `${SIZE}px`, height: `${SIZE}px` }">
-      <!-- Pointer at 12 o'clock -->
-      <div
-        class="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1"
-        style="
-          width: 0;
-          height: 0;
-          border-left: 12px solid transparent;
-          border-right: 12px solid transparent;
-          border-top: 22px solid #111;
-        "
-      />
-
-      <div
-        ref="wheel"
-        class="will-change-transform"
-        :style="{
-          transform: `rotate(${rotation}deg)`,
-          transition: animating ? 'transform 5s cubic-bezier(0.12, 0.7, 0.15, 1)' : 'none'
-        }"
-        @transitionend="onTransitionEnd"
-      >
-        <svg :viewBox="`0 0 ${SIZE} ${SIZE}`" :width="SIZE" :height="SIZE">
-          <g v-for="s in slices" :key="s.entry.id">
-            <path :d="s.path" :fill="s.color" stroke="white" stroke-width="2" />
-            <text
-              :x="C + R - 14"
-              :y="C"
-              :transform="`rotate(${s.center - 90} ${C} ${C})`"
-              text-anchor="end"
-              dominant-baseline="middle"
-              font-size="15"
-              font-weight="600"
-              fill="#111"
-            >
-              {{ s.label }}
-            </text>
-          </g>
-          <circle :cx="C" :cy="C" r="14" fill="white" stroke="#111" stroke-width="2" />
-        </svg>
-      </div>
-    </div>
-
-    <p class="h-6 font-semibold text-red-700">
-      <template v-if="landed">Eliminated: {{ pickedName }}</template>
-    </p>
-  </div>
-</template>

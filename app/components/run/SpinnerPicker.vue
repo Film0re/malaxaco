@@ -1,12 +1,22 @@
 <script setup lang="ts">
-const model = defineModel<SpinnerVariantId>({ required: true });
-defineProps<{ disabled?: boolean }>();
+import type { SpinnerVariant } from "~/types/spinner";
+import { SPINNER_LABELS } from "~/types/spinner";
+
+const model = defineModel<SpinnerVariant>({
+  required: true
+});
+
+defineProps<{
+  disabled?: boolean;
+}>();
+
+const spinnerVariantIds = Object.keys(SPINNER_LABELS) as SpinnerVariant[];
 </script>
 
 <template>
   <div class="inline-flex rounded border p-0.5" role="radiogroup" aria-label="Animation">
     <button
-      v-for="id in SPINNER_VARIANT_IDS"
+      v-for="id in spinnerVariantIds"
       :key="id"
       type="button"
       role="radio"
@@ -16,7 +26,7 @@ defineProps<{ disabled?: boolean }>();
       :class="model === id ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'"
       @click="model = id"
     >
-      {{ spinnerVariants[id].label }}
+      {{ SPINNER_LABELS[id] }}
     </button>
   </div>
 </template>
