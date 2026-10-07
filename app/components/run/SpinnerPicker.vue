@@ -1,18 +1,3 @@
-<script setup lang="ts">
-import type { SpinnerVariant } from "~/types/spinner";
-import { SPINNER_LABELS } from "~/types/spinner";
-
-const model = defineModel<SpinnerVariant>({
-  required: true
-});
-
-defineProps<{
-  disabled?: boolean;
-}>();
-
-const spinnerVariantIds = Object.keys(SPINNER_LABELS) as SpinnerVariant[];
-</script>
-
 <template>
   <div class="inline-flex rounded border p-0.5" role="radiogroup" aria-label="Animation">
     <button
@@ -30,3 +15,18 @@ const spinnerVariantIds = Object.keys(SPINNER_LABELS) as SpinnerVariant[];
     </button>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { SpinnerVariant } from "~/types/spinner";
+import { SPINNER_LABELS } from "~/types/spinner";
+
+const model = defineModel<SpinnerVariant>({
+  required: true
+});
+
+defineProps<{
+  disabled?: boolean;
+}>();
+
+const spinnerVariantIds = Object.keys(SPINNER_LABELS) as SpinnerVariant[];
+</script>

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-const { data: runs } = await useFetch<Run[]>("/api/runs");
-</script>
-
 <template>
   <main class="mx-auto max-w-xl space-y-10 p-6">
     <RunCreateForm />
@@ -12,3 +8,7 @@ const { data: runs } = await useFetch<Run[]>("/api/runs");
     </section>
   </main>
 </template>
+
+<script setup lang="ts">
+const { data: runs } = await useFetch<Run[]>("/api/runs");
+</script>

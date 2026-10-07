@@ -1,43 +1,3 @@
-<script setup lang="ts">
-import { useReplay } from "#imports";
-
-const id = useRoute().params.id as string;
-
-const { data: run, error: loadError, refresh } = await useFetch<RunDetails>(`/api/runs/${id}`);
-
-const { remaining, eliminated, winner } = useRunProgress(run);
-const variant = useSpinnerVariant();
-const { spinning, error, targetId, spin, settle } = useSpin(id, refresh);
-const {
-  replaying,
-  pauseRequested,
-  paused,
-  entries: replayEntries,
-  eliminated: replayEliminated,
-  targetId: replayTarget,
-  start: startReplay,
-  stop: stopReplay,
-  pause: pauseReplay,
-  resume: resumeReplay,
-  next: nextReplay
-} = useReplay(run);
-
-// While replaying, swap the live data for the replay's
-const shownEntries = computed(() => (replaying.value ? replayEntries.value : remaining.value));
-const shownEliminated = computed(() =>
-  replaying.value ? replayEliminated.value : eliminated.value
-);
-const shownTarget = computed(() => (replaying.value ? replayTarget.value : targetId.value));
-const showSpinner = computed(() => replaying.value || !winner.value);
-
-// The picker is only safe to use while nothing is animating
-const pickerDisabled = computed(() => spinning.value || (replaying.value && !paused.value));
-
-function onDone() {
-  return replaying.value ? nextReplay() : settle();
-}
-</script>
-
 <template>
   <main class="mx-auto w-full max-w-xl space-y-6 p-6">
     <NuxtLink to="/wheel" class="text-sm text-gray-500 hover:underline">← All runs</NuxtLink>
@@ -110,3 +70,43 @@ function onDone() {
     </template>
   </main>
 </template>
+
+<script setup lang="ts">
+import { useReplay } from "#imports";
+
+const id = useRoute().params.id as string;
+
+const { data: run, error: loadError, refresh } = await useFetch<RunDetails>(`/api/runs/${id}`);
+
+const { remaining, eliminated, winner } = useRunProgress(run);
+const variant = useSpinnerVariant();
+const { spinning, error, targetId, spin, settle } = useSpin(id, refresh);
+const {
+  replaying,
+  pauseRequested,
+  paused,
+  entries: replayEntries,
+  eliminated: replayEliminated,
+  targetId: replayTarget,
+  start: startReplay,
+  stop: stopReplay,
+  pause: pauseReplay,
+  resume: resumeReplay,
+  next: nextReplay
+} = useReplay(run);
+
+// While replaying, swap the live data for the replay's
+const shownEntries = computed(() => (replaying.value ? replayEntries.value : remaining.value));
+const shownEliminated = computed(() =>
+  replaying.value ? replayEliminated.value : eliminated.value
+);
+const shownTarget = computed(() => (replaying.value ? replayTarget.value : targetId.value));
+const showSpinner = computed(() => replaying.value || !winner.value);
+
+// The picker is only safe to use while nothing is animating
+const pickerDisabled = computed(() => spinning.value || (replaying.value && !paused.value));
+
+function onDone() {
+  return replaying.value ? nextReplay() : settle();
+}
+</script>

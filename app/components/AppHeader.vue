@@ -1,4 +1,16 @@
-<!-- app/components/AppHeader.vue -->
+<template>
+  <header class="w-full border-b border-emerald-800 bg-emerald-700 text-white shadow-md">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+      <NuxtLink to="/" :class="linkClass(isHome)">Home</NuxtLink>
+      <nav class="flex items-center gap-6">
+        <NuxtLink v-for="l in links" :key="l.to" :to="l.to" :class="linkClass(l.match(route.path))">
+          {{ l.label }}
+        </NuxtLink>
+      </nav>
+    </div>
+  </header>
+</template>
+
 <script setup lang="ts">
 const route = useRoute();
 
@@ -17,16 +29,3 @@ const links = [
 const linkClass = (active: boolean) =>
   active ? "text-white underline underline-offset-8" : "text-gray-300 hover:text-white";
 </script>
-
-<template>
-  <header class="w-full border-b border-emerald-800 bg-emerald-700 text-white shadow-md">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-      <NuxtLink to="/" :class="linkClass(isHome)">Home</NuxtLink>
-      <nav class="flex items-center gap-6">
-        <NuxtLink v-for="l in links" :key="l.to" :to="l.to" :class="linkClass(l.match(route.path))">
-          {{ l.label }}
-        </NuxtLink>
-      </nav>
-    </div>
-  </header>
-</template>
