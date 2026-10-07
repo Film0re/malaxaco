@@ -19,7 +19,7 @@ const linkClass = (active: boolean) =>
 </script>
 
 <template>
-  <header class="w-full border-b border-zinc-700 bg-zinc-600 text-white shadow-md">
+  <header class="w-full border-b border-emerald-800 bg-emerald-700 text-white shadow-md">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
       <NuxtLink to="/" :class="linkClass(isHome)">Home</NuxtLink>
       <nav class="flex items-center gap-6">
