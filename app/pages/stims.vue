@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center text-center gap-4">
+  <main class="flex min-h-screen items-center justify-center flex-col gap-4">
     <div>{{ currentStimText }} ({{ currentStimAcronym }})</div>
 
     <button
@@ -8,7 +8,7 @@
     >
       Create New Stim
     </button>
-  </div>
+  </main>
 </template>
 <script setup lang="ts">
 import { capitalize, ref, type Ref } from "vue";

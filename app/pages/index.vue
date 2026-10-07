@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-center flex-col items-center">
+  <main class="flex min-h-screen items-center justify-center flex-col">
     <div>
       <a
         href="https://www.costco.com/1-oz-gold-argor-heraeus-kinebar-new-in-assay.product.4000329233.html"
@@ -11,5 +11,5 @@
     </div>
 
     <GrumpierGrinch class="pt-10" />
-  </div>
+  </main>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen items-center justify-center">
+  <div class="min-h-screen">
     <NuxtPage />
   </div>
 </template>
@@ -14,6 +14,6 @@ useSeoMeta({
   twitterCard: "summary_large_image",
   twitterTitle: "Malaxaco ™️",
   twitterDescription: "Grape mass is negligible",
-  twitterImage: "/sun.jpg",
+  twitterImage: "/sun.jpg"
 });
 </script>
