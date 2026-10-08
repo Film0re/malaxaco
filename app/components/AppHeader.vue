@@ -1,11 +1,14 @@
 <template>
   <header class="w-full border-b border-emerald-800 bg-emerald-700 text-white shadow-md">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+    <div class="mx-auto flex max-w-7xl items-center px-4 py-4">
       <NuxtLink to="/" :class="linkClass(isHome)">Home</NuxtLink>
-      <nav class="flex items-center gap-6">
+
+      <nav class="ml-auto flex items-center gap-6">
         <NuxtLink v-for="l in links" :key="l.to" :to="l.to" :class="linkClass(l.match(route.path))">
           {{ l.label }}
         </NuxtLink>
+
+        <AuthLogin />
       </nav>
     </div>
   </header>

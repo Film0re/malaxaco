@@ -2,11 +2,15 @@
 DELETE FROM eliminations;
 DELETE FROM entries;
 DELETE FROM runs;
+DELETE FROM users WHERE provider = 'seed';
 DELETE FROM sqlite_sequence WHERE name IN ('runs', 'entries', 'eliminations');
 
+INSERT INTO users (provider, provider_id, name)
+VALUES ('seed', 'seed-1', 'Seed User');
+
 -- Run 1: finished (Dave won)
-INSERT INTO runs (id, started_at, finished_at) VALUES
-  (1, '2026-10-01T18:00:00Z', '2026-10-01T18:05:00Z');
+INSERT INTO runs (id, user_id, started_at, finished_at) VALUES
+  (1, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-01T18:00:00Z', '2026-10-01T18:05:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (1, 1, 'Alice'),
@@ -20,8 +24,8 @@ INSERT INTO eliminations (run_id, entry_id, spin_number, created_at) VALUES
   (1, 1, 3, '2026-10-01T18:05:00Z');
 
 -- Run 2: in progress (5 entries, 2 eliminated, 3 remaining)
-INSERT INTO runs (id, started_at) VALUES
-  (2, '2026-10-05T12:00:00Z');
+INSERT INTO runs (id, user_id, started_at) VALUES
+  (2, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-05T12:00:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (5, 2, 'Pizza'),
@@ -35,8 +39,8 @@ INSERT INTO eliminations (run_id, entry_id, spin_number, created_at) VALUES
   (2, 9, 2, '2026-10-05T12:02:00Z');
 
 -- Run 3: fresh, no spins yet
-INSERT INTO runs (id, started_at) VALUES
-  (3, '2026-10-06T09:00:00Z');
+INSERT INTO runs (id, user_id, started_at) VALUES
+  (3, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-06T09:00:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (10, 3, 'Red'),

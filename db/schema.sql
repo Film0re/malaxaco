@@ -1,10 +1,30 @@
 PRAGMA foreign_keys = ON;
 
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    provider TEXT NOT NULL,        -- 'github', 'google', ...
+    provider_id TEXT NOT NULL,     -- the provider's stable user id, as text
+    name TEXT,
+    email TEXT,
+    avatar_url TEXT,
+
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+
+    UNIQUE (provider, provider_id)
+) STRICT;
+
 CREATE TABLE runs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+    user_id INTEGER NOT NULL,
+
     started_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
-    finished_at TEXT
+    finished_at TEXT,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 ) STRICT;
 
 CREATE TABLE entries (
@@ -38,6 +58,9 @@ CREATE TABLE eliminations (
     UNIQUE (run_id, spin_number),
     UNIQUE (run_id, entry_id)
 ) STRICT;
+
+CREATE INDEX idx_runs_user_id
+    ON runs(user_id);
 
 CREATE INDEX idx_entries_run_id
     ON entries(run_id);
