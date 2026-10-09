@@ -1,6 +1,11 @@
 <template>
   <main class="flex gap-4 flex-1 flex-col items-center justify-center">
-    <div>{{ currentStimText }} ({{ currentStimAcronym }})</div>
+    <div>
+      <span v-for="(part, i) in currentStimParts" :key="i" :class="part.class">{{
+        part.text
+      }}</span>
+      ({{ currentStimAcronym }})
+    </div>
 
     <button
       class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
@@ -10,20 +15,24 @@
     </button>
   </main>
 </template>
+
 <script setup lang="ts">
-import { capitalize, ref, type Ref } from "vue";
+import { capitalize, ref } from "vue";
 
-const stims: Ref<string[]> = ref([
-  "Ni De Cho Wei",
-  "Hiberate Jenkins Buttons",
-  "Pickle Pub Burger",
-  "Ube Potato",
-  "Max Book",
-  "Jimmy"
-]);
+type Part = { text: string; class?: string };
+type Stim = Part[];
 
-const currentStimText = computed(() => currentStim.value.join(" "));
-const currentStimAcronym = computed(() => acronymConverter(currentStimText.value));
+// Plain strings get a one-liner helper; styled bits are explicit parts.
+const plain = (text: string): Stim => [{ text }];
+
+const stims: Stim[] = [
+  plain("Ni De Cho Wei"),
+  plain("Hiberate Jenkins Buttons"),
+  plain("Pickle Pub Burger"),
+  plain("Ube Potato"),
+  plain("Max Book"),
+  plain("Jimmy")
+];
 
 // Fisher–Yates shuffle
 const shuffle = <T>(items: T[]): T[] => {
@@ -40,16 +49,23 @@ const shuffle = <T>(items: T[]): T[] => {
   return shuffled;
 };
 
-const craftNewStim = (): string[] => {
-  return shuffle(stims.value).slice(0, 2);
+// Pick two stims and flatten them into one list of parts,
+// with a space between them so words don't run together.
+const craftNewStim = (): Part[] => {
+  const [a, b] = shuffle(stims).slice(0, 2) as [Stim, Stim];
+  return [...a, { text: " " }, ...b];
 };
 
-const currentStim = ref<string[]>(craftNewStim());
+const currentStim = ref<Part[]>(craftNewStim());
+
+const currentStimParts = computed(() => currentStim.value);
+const currentStimText = computed(() => currentStim.value.map((p) => p.text).join(""));
+const currentStimAcronym = computed(() => acronymConverter(currentStimText.value));
 
 const acronymConverter = (phrase: string) =>
   phrase
     .split(" ")
-    .map((word) => word.at(0) ?? "")
-    .map(capitalize)
+    .filter(Boolean)
+    .map((word) => capitalize(word.at(0) ?? ""))
     .join("");
 </script>
