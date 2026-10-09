@@ -5,9 +5,8 @@
       class="flex items-baseline justify-between gap-4 p-3 hover:bg-gray-50"
     >
       <span class="min-w-0 truncate">
-        Run #{{ run.id }}
         <ClientOnly>
-          <span class="text-gray-500"> · {{ formatDate(run.started_at) }}</span>
+          <span class="text-gray-500"> {{ formatDate(run.started_at) }}</span>
         </ClientOnly>
       </span>
       <span
