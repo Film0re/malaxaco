@@ -3,6 +3,7 @@ declare module "#auth-utils" {
     id: number;
     name: string;
     avatarUrl?: string;
+    provider: "google" | "riot" | "guest";
   }
 }
 export {};

@@ -9,11 +9,15 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
     throw createError({ statusCode: 400, statusMessage: error });
   }
 
+  const user = await ensureUser(event);
+
   const run = await db
     .prepare(`
-      INSERT INTO runs DEFAULT VALUES
+      INSERT INTO runs (user_id)
+      VALUES (?)
       RETURNING id, started_at, finished_at
     `)
+    .bind(user.id)
     .first<Run>();
 
   if (!run) {

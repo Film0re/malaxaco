@@ -18,7 +18,12 @@ export default defineOAuthGoogleEventHandler({
       .first<{ id: number }>();
 
     await setUserSession(event, {
-      user: { id: row!.id, name: user.name, avatarUrl: user.picture }
+      user: {
+        id: row!.id,
+        name: user.name,
+        avatarUrl: user.picture,
+        provider: "google"
+      }
     });
 
     return sendRedirect(event, "/");

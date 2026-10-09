@@ -1,3 +1,5 @@
+import { getUser } from "~~/server/utils/auth";
+
 export default defineEventHandler(async (event): Promise<RunDetails> => {
   const db = event.context.cloudflare.env.DB;
 
@@ -10,6 +12,15 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
     });
   }
 
+  const user = await getUser(event);
+
+  if (!user) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Run not found."
+    });
+  }
+
   const run = await db
     .prepare(`
       SELECT
@@ -17,9 +28,9 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
         started_at,
         finished_at
       FROM runs
-      WHERE id = ?
+      WHERE id = ? AND user_id = ?
     `)
-    .bind(id)
+    .bind(id, user.id)
     .first<Run>();
 
   if (!run) {

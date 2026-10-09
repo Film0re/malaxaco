@@ -7,9 +7,20 @@ export default defineEventHandler(async (event): Promise<SpinResult> => {
     throw createError({ statusCode: 400, statusMessage: "Invalid run ID." });
   }
 
+  // A spin only makes sense on a run you already own, so no guest creation here.
+  const user = await getUser(event);
+
+  if (!user) {
+    throw createError({ statusCode: 404, statusMessage: "Run not found." });
+  }
+
   const run = await db
-    .prepare(`SELECT id, started_at, finished_at FROM runs WHERE id = ?`)
-    .bind(id)
+    .prepare(`
+      SELECT id, started_at, finished_at
+      FROM runs
+      WHERE id = ? AND user_id = ?
+    `)
+    .bind(id, user.id)
     .first<Run>();
 
   if (!run) {
