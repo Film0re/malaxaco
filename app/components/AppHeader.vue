@@ -1,6 +1,6 @@
 <template>
   <header class="w-full border-b border-emerald-800 bg-emerald-700 text-white shadow-md">
-    <div class="mx-auto flex max-w-7xl items-center px-4 py-4">
+    <div class="flex items-center px-6 py-4">
       <NuxtLink to="/" :class="linkClass(isHome)">Home</NuxtLink>
 
       <nav class="ml-auto flex items-center gap-6">
