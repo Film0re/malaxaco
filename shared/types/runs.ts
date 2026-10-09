@@ -4,6 +4,13 @@ export interface Run {
   finished_at: string | null;
 }
 
+export interface RunPage {
+  runs: Run[];
+  page: number;
+  totalPages: number;
+  total: number;
+}
+
 export interface Entry {
   id: number;
   run_id: number;
