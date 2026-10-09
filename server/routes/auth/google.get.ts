@@ -17,7 +17,18 @@ export default defineOAuthGoogleEventHandler({
       .bind(user.sub, user.name, user.email, user.picture)
       .first<{ id: number }>();
 
-    await setUserSession(event, {
+    // Read the guest BEFORE the session gets replaced below.
+    const current = await getUserSession(event);
+    const guest = current.user?.provider === "guest" ? current.user : null;
+
+    if (guest && guest.id !== row!.id) {
+      await db.batch([
+        db.prepare(`UPDATE runs SET user_id = ?1 WHERE user_id = ?2`).bind(row!.id, guest.id),
+        db.prepare(`DELETE FROM users WHERE id = ?1 AND provider = 'guest'`).bind(guest.id)
+      ]);
+    }
+
+    await replaceUserSession(event, {
       user: {
         id: row!.id,
         name: user.name,
