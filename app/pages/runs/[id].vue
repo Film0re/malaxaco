@@ -54,7 +54,7 @@
 
       <button
         v-if="!replaying && !spinning && run.eliminations.length"
-        class="rounded border px-4 py-2 text-sm hover:bg-gray-50"
+        class="block rounded border px-4 py-2 text-sm hover:bg-gray-50"
         @click="startReplay"
       >
         ▶ Replay eliminations
