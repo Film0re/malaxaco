@@ -31,7 +31,8 @@ const stims: Stim[] = [
   plain("Pickle Pub Burger"),
   plain("Ube Potato"),
   plain("Max Book"),
-  plain("Jimmy")
+  plain("Jimmy"),
+  [{ text: "We can be " }, { text: "bees", class: "italic" }]
 ];
 
 // Fisher–Yates shuffle
