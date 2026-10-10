@@ -2,15 +2,23 @@
 DELETE FROM eliminations;
 DELETE FROM entries;
 DELETE FROM runs;
-DELETE FROM users WHERE provider = 'seed';
+-- Deleting the seed user also cascades to its oauth_accounts row
+DELETE FROM users
+WHERE id IN (
+  SELECT user_id FROM oauth_accounts WHERE provider = 'seed'
+);
 DELETE FROM sqlite_sequence WHERE name IN ('runs', 'entries', 'eliminations');
 
-INSERT INTO users (provider, provider_id, name)
-VALUES ('seed', 'seed-1', 'Seed User');
+-- The seed user is identified by an oauth_accounts row with provider 'seed'
+INSERT INTO users (name)
+VALUES ('Seed User');
+
+INSERT INTO oauth_accounts (provider, provider_id, user_id)
+VALUES ('seed', 'seed-1', last_insert_rowid());
 
 -- Run 1: finished (Dave won)
 INSERT INTO runs (id, user_id, started_at, finished_at) VALUES
-  (1, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-01T18:00:00Z', '2026-10-01T18:05:00Z');
+  (1, (SELECT user_id FROM oauth_accounts WHERE provider = 'seed' AND provider_id = 'seed-1'), '2026-10-01T18:00:00Z', '2026-10-01T18:05:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (1, 1, 'Alice'),
@@ -25,7 +33,7 @@ INSERT INTO eliminations (run_id, entry_id, spin_number, created_at) VALUES
 
 -- Run 2: in progress (5 entries, 2 eliminated, 3 remaining)
 INSERT INTO runs (id, user_id, started_at) VALUES
-  (2, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-05T12:00:00Z');
+  (2, (SELECT user_id FROM oauth_accounts WHERE provider = 'seed' AND provider_id = 'seed-1'), '2026-10-05T12:00:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (5, 2, 'Pizza'),
@@ -40,7 +48,7 @@ INSERT INTO eliminations (run_id, entry_id, spin_number, created_at) VALUES
 
 -- Run 3: fresh, no spins yet
 INSERT INTO runs (id, user_id, started_at) VALUES
-  (3, (SELECT id FROM users WHERE provider = 'seed'), '2026-10-06T09:00:00Z');
+  (3, (SELECT user_id FROM oauth_accounts WHERE provider = 'seed' AND provider_id = 'seed-1'), '2026-10-06T09:00:00Z');
 
 INSERT INTO entries (id, run_id, name) VALUES
   (10, 3, 'Red'),

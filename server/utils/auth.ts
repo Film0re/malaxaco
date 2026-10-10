@@ -8,18 +8,23 @@ export async function getUser(event: H3Event) {
 
 // For writes: returns the user, creating an anonymous guest if needed.
 export async function ensureUser(event: H3Event) {
+  const db = event.context.cloudflare.env.DB as D1Database;
   const existing = await getUser(event);
+
   if (existing) {
-    return existing;
+    // The session can outlive its row (dropped DB, guest cleanup, etc.)
+    const stillExists = await db
+      .prepare(`SELECT 1 AS ok FROM users WHERE id = ?1`)
+      .bind(existing.id)
+      .first();
+
+    if (stillExists) {
+      return existing;
+    }
   }
 
-  const db = event.context.cloudflare.env.DB as D1Database;
   const row = await db
-    .prepare(
-      `INSERT INTO users (provider, provider_id, name)
-       VALUES ('guest', ?1, 'Guest') RETURNING id`
-    )
-    .bind(crypto.randomUUID())
+    .prepare(`INSERT INTO users (name) VALUES ('Guest') RETURNING id`)
     .first<{ id: number }>();
 
   const user = { id: row!.id, name: "Guest", provider: "guest" as const };
