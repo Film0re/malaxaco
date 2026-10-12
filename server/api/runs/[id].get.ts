@@ -6,7 +6,7 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
 
   const id = Number(getRouterParam(event, "id"));
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isSafeInteger(id)) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid run ID."
