@@ -1,11 +1,12 @@
 <template>
-  <section class="mx-auto max-w-sm space-y-4 p-4">
+  <section class="mx-auto w-full max-w-sm space-y-4 p-4">
     <h1 class="text-2xl font-bold">
       {{ mode === "login" ? "Sign in" : "Create account" }}
     </h1>
+
     <p class="text-sm text-gray-600 dark:text-gray-300">Your current runs will be kept.</p>
 
-    <div class="space-y-2">
+    <div>
       <a
         href="/auth/google"
         class="block rounded-lg border px-4 py-2 text-center text-sm font-medium hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:hover:bg-gray-800"
@@ -19,6 +20,7 @@
     <form class="space-y-3" @submit.prevent="submit">
       <div>
         <label for="username" class="mb-1 block text-sm font-medium"> Username </label>
+
         <input
           id="username"
           ref="usernameInput"
@@ -28,6 +30,7 @@
           :aria-describedby="errors.username ? 'username-error' : undefined"
           class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-invalid:border-red-600"
         />
+
         <ul v-if="errors.username" id="username-error" class="mt-1 space-y-1 text-sm text-red-600">
           <li v-for="message in errors.username" :key="message">
             {{ message }}
@@ -37,6 +40,7 @@
 
       <div>
         <label for="password" class="mb-1 block text-sm font-medium"> Password </label>
+
         <input
           id="password"
           ref="passwordInput"
@@ -47,6 +51,7 @@
           :aria-describedby="errors.password ? 'password-error' : undefined"
           class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-invalid:border-red-600"
         />
+
         <ul v-if="errors.password" id="password-error" class="mt-1 space-y-1 text-sm text-red-600">
           <li v-for="message in errors.password" :key="message">
             {{ message }}
@@ -62,13 +67,14 @@
         <button
           type="submit"
           :disabled="pending"
-          class="rounded-lg bg-black px-4 py-2 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
+          class="w-36 shrink-0 rounded-lg bg-black px-4 py-2 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
         >
           {{ pending ? "Working..." : mode === "login" ? "Log in" : "Create account" }}
         </button>
+
         <button
           type="button"
-          class="rounded underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          class="shrink-0 whitespace-nowrap rounded underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           @click="mode = mode === 'login' ? 'register' : 'login'"
         >
           {{ mode === "login" ? "Need an account?" : "Have an account?" }}

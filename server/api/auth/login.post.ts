@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { LoginSchema } from "#shared/schemas/auth";
-import { absorbGuest, getGuestId, startSession } from "~~/server/utils/auth";
+import { startSession } from "~~/server/utils/auth";
 
 // Hashed once per Worker instance; used so unknown usernames cost the same time as wrong passwords.
 let dummy: Promise<string> | undefined;
