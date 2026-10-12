@@ -10,6 +10,9 @@ export default defineNuxtConfig({
       link: [{ rel: "icon", type: "image/svg+xml", href: "/grape.svg" }]
     }
   },
+  runtimeConfig: {
+    session: { maxAge: 60 * 60 * 24 * 90 }
+  },
 
   vite: {
     plugins: [tailwindcss()]

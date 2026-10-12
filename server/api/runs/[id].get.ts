@@ -1,7 +1,6 @@
 import * as v from "valibot";
 import { RunIdParams } from "#shared/schemas/run";
 import { getUser } from "~~/server/utils/auth";
-import { useDB } from "~~/server/utils/db";
 
 export default defineEventHandler(async (event): Promise<RunDetails> => {
   const { id } = await getValidatedRouterParams(event, (p) => v.parse(RunIdParams, p));

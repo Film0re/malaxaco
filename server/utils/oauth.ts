@@ -1,5 +1,6 @@
 import type { H3Event } from "h3";
 import type { User } from "#auth-utils";
+import { absorbGuest, startSession } from "./auth";
 
 export interface OAuthProfile {
   provider: Exclude<User["provider"], "guest">;
@@ -9,38 +10,10 @@ export interface OAuthProfile {
   avatarUrl?: string | null;
 }
 
-function getDb(event: H3Event) {
-  return event.context.cloudflare.env.DB as D1Database;
-}
+type UserRow = { id: number; name: string | null; avatar_url: string | null };
 
-// Returns the current guest's user id, or null if the session isn't a valid guest.
-// Also reusable by a future username/password register route.
-export async function getGuestId(event: H3Event): Promise<number | null> {
-  const current = await getUserSession(event);
-  if (current.user?.provider !== "guest") {
-    return null;
-  }
-
-  // Only trust it if the row still exists and has no login method attached.
-  const row = await getDb(event)
-    .prepare(
-      `SELECT id FROM users u
-       WHERE u.id = ?1
-         AND NOT EXISTS (SELECT 1 FROM oauth_accounts WHERE user_id = u.id)
-         AND NOT EXISTS (SELECT 1 FROM credentials WHERE user_id = u.id)`
-    )
-    .bind(current.user.id)
-    .first<{ id: number }>();
-
-  return row?.id ?? null;
-}
-
-// Finds or creates the user for an OAuth identity, absorbs any guest session,
-// replaces the session, and redirects home.
 export async function completeOAuthLogin(event: H3Event, profile: OAuthProfile) {
-  const db = getDb(event);
-
-  // D1 rejects `undefined` bindings, so normalize everything to string | null.
+  const db = useDB(event);
   const name = profile.name ?? null;
   const email = profile.email ?? null;
   const avatarUrl = profile.avatarUrl ?? null;
@@ -53,64 +26,61 @@ export async function completeOAuthLogin(event: H3Event, profile: OAuthProfile) 
     .bind(profile.provider, profile.providerId)
     .first<{ user_id: number }>();
 
+  // Fill gaps and refresh the avatar, but never overwrite a name the user chose.
   const updateProfile = (id: number) =>
     db
-      .prepare(`UPDATE users SET name = ?1, email = ?2, avatar_url = ?3 WHERE id = ?4`)
+      .prepare(`
+      UPDATE users
+      SET name = COALESCE(name, ?1), email = COALESCE(email, ?2),
+          avatar_url = COALESCE(?3, avatar_url)
+      WHERE id = ?4
+      RETURNING id, name, avatar_url`)
       .bind(name, email, avatarUrl, id);
 
-  let userId: number;
+  const link = (userId: number) =>
+    db
+      .prepare(`INSERT INTO oauth_accounts (provider, provider_id, user_id) VALUES (?1, ?2, ?3)`)
+      .bind(profile.provider, profile.providerId, userId);
+
+  // The first statement in every plan returns the user row.
+  let statements: D1PreparedStatement[];
 
   if (existing) {
-    // Returning user: refresh profile, absorb any guest's runs.
-    userId = existing.user_id;
-    const stmts = [updateProfile(userId)];
-
-    if (guestId && guestId !== userId) {
-      stmts.push(
-        db.prepare(`UPDATE runs SET user_id = ?1 WHERE user_id = ?2`).bind(userId, guestId),
-        db.prepare(`DELETE FROM users WHERE id = ?1`).bind(guestId)
-      );
-    }
-    await db.batch(stmts);
+    statements = [
+      updateProfile(existing.user_id),
+      ...(guestId && guestId !== existing.user_id ? absorbGuest(db, guestId, existing.user_id) : [])
+    ];
   } else if (guestId) {
-    // New identity, was a guest: promote the guest row, keep their runs.
-    userId = guestId;
-    await db.batch([
-      updateProfile(userId),
-      db
-        .prepare(`INSERT INTO oauth_accounts (provider, provider_id, user_id) VALUES (?1, ?2, ?3)`)
-        .bind(profile.provider, profile.providerId, userId)
-    ]);
+    statements = [updateProfile(guestId), link(guestId)];
   } else {
-    // Brand new user.
-    const [inserted] = await db.batch<{ id: number }>([
+    statements = [
       db
-        .prepare(`INSERT INTO users (name, email, avatar_url) VALUES (?1, ?2, ?3) RETURNING id`)
+        .prepare(`
+        INSERT INTO users (name, email, avatar_url) VALUES (?1, ?2, ?3)
+        RETURNING id, name, avatar_url`)
         .bind(name, email, avatarUrl),
       db
-        .prepare(
-          `INSERT INTO oauth_accounts (provider, provider_id, user_id)
-           VALUES (?1, ?2, last_insert_rowid())`
-        )
+        .prepare(`
+        INSERT INTO oauth_accounts (provider, provider_id, user_id)
+        VALUES (?1, ?2, last_insert_rowid())`)
         .bind(profile.provider, profile.providerId)
-    ]);
-
-    const newId = inserted?.results[0]?.id;
-    if (newId === undefined) {
-      throw createError({ statusCode: 500, statusMessage: "Failed to create user." });
-    }
-    userId = newId;
+    ];
   }
 
-  await replaceUserSession(event, {
-    user: {
-      id: userId,
-      name: name ?? "User",
-      avatarUrl: avatarUrl ?? undefined,
-      provider: profile.provider
+  let row: UserRow | undefined;
+  try {
+    row = (await db.batch<UserRow>(statements))[0]?.results[0];
+  } catch (err) {
+    if (String((err as Error)?.message ?? err).includes("UNIQUE constraint failed")) {
+      return oauthFailed(event, profile.provider, err);
     }
-  });
+    throw err;
+  }
+  if (!row) {
+    throw createError({ statusCode: 500, statusMessage: "Failed to sign in." });
+  }
 
+  await startSession(event, row, profile.provider);
   return sendRedirect(event, "/");
 }
 

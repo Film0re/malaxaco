@@ -4,7 +4,7 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    name TEXT,
+    name TEXT UNIQUE COLLATE NOCASE,
     email TEXT,
     avatar_url TEXT,
 

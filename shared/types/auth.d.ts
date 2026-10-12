@@ -4,9 +4,9 @@ import type { OAuthProvider } from "#shared/auth";
 declare module "#auth-utils" {
   interface User {
     id: number;
-    name: string;
+    name: string | null;
     avatarUrl?: string;
-    provider: OAuthProvider | "guest";
+    provider: OAuthProvider | "guest" | "credentials";
   }
 }
 export {};

@@ -2,7 +2,6 @@
 import * as v from "valibot";
 import { PageQuery } from "#shared/schemas/run";
 import { getUser } from "~~/server/utils/auth";
-import { useDB } from "~~/server/utils/db";
 
 const PAGE_SIZE = 10;
 

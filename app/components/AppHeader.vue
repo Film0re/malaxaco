@@ -8,7 +8,7 @@
           {{ l.label }}
         </NuxtLink>
 
-        <AuthLogin />
+        <AccountButton />
       </nav>
     </div>
   </header>

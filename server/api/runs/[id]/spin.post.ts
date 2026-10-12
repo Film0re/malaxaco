@@ -1,7 +1,6 @@
 import * as v from "valibot";
 import { RunIdParams } from "#shared/schemas/run";
 import { getUser } from "~~/server/utils/auth";
-import { useDB } from "~~/server/utils/db";
 
 const notFound = () => createError({ statusCode: 404, statusMessage: "Run not found." });
 

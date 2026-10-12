@@ -1,7 +1,6 @@
 // server/api/runs.post.ts
 import * as v from "valibot";
 import { CreateRunSchema } from "#shared/schemas/run";
-import { useDB } from "~~/server/utils/db";
 
 export default defineEventHandler(async (event): Promise<RunDetails> => {
   const db = useDB(event);
