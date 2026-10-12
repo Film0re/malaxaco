@@ -1,5 +1,7 @@
+import { useDB } from "~~/server/utils/db";
+
 export default defineEventHandler(async (event): Promise<SpinResult> => {
-  const db = event.context.cloudflare.env.DB;
+  const db = useDB(event);
 
   const id = Number(getRouterParam(event, "id"));
 

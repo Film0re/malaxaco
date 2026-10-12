@@ -1,7 +1,8 @@
 import { getUser } from "~~/server/utils/auth";
+import { useDB } from "~~/server/utils/db";
 
 export default defineEventHandler(async (event): Promise<RunDetails> => {
-  const db = event.context.cloudflare.env.DB;
+  const db = useDB(event);
 
   const id = Number(getRouterParam(event, "id"));
 

@@ -1,7 +1,9 @@
+import { useDB } from "~~/server/utils/db";
+
 const PAGE_SIZE = 10;
 
 export default defineEventHandler(async (event): Promise<RunPage> => {
-  const db = event.context.cloudflare.env.DB;
+  const db = useDB(event);
 
   const user = await getUser(event);
 
