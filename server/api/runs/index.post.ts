@@ -1,67 +1,53 @@
+// server/api/runs.post.ts
+import * as v from "valibot";
+import { CreateRunSchema } from "#shared/schemas/run";
 import { useDB } from "~~/server/utils/db";
 
 export default defineEventHandler(async (event): Promise<RunDetails> => {
   const db = useDB(event);
 
-  const body = await readBody<CreateRunRequest>(event);
-
-  const { entries, error } = validateEntries(body?.entries);
-
-  if (error) {
-    throw createError({ statusCode: 400, statusMessage: error });
-  }
+  // Validate before ensureUser, so bad requests never create a guest row.
+  const { entries } = await readValidatedBody(event, (b) => v.parse(CreateRunSchema, b));
 
   const user = await ensureUser(event);
 
-  const run = await db
-    .prepare(`
-      INSERT INTO runs (user_id)
-      VALUES (?)
-      RETURNING id, started_at, finished_at
-    `)
-    .bind(user.id)
-    .first<Run>();
+  // Inside a batch, writes are serialized in one transaction, so the user's
+  // newest run is the one inserted by the first statement.
+  const latestRun = `(SELECT id FROM runs WHERE user_id = ?1 ORDER BY id DESC LIMIT 1)`;
+
+  const [runRes, , entriesRes] = await db.batch([
+    db
+      .prepare(
+        `INSERT INTO runs (user_id) VALUES (?1)
+         RETURNING id, started_at, finished_at`
+      )
+      .bind(user.id),
+
+    db
+      .prepare(
+        `INSERT INTO entries (run_id, name)
+         SELECT ${latestRun}, value FROM json_each(?2)`
+      )
+      .bind(user.id, JSON.stringify(entries)),
+
+    db
+      .prepare(
+        `SELECT id, run_id, name FROM entries
+         WHERE run_id = ${latestRun}
+         ORDER BY id`
+      )
+      .bind(user.id)
+  ]);
+
+  const run = runRes!.results[0] as Run | undefined;
 
   if (!run) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to create run."
-    });
+    throw createError({ statusCode: 500, statusMessage: "Failed to create run." });
   }
 
-  const insertEntry = db.prepare(`
-    INSERT INTO entries (run_id, name)
-    VALUES (?, ?)
-  `);
-
-  const selectEntries = db
-    .prepare(`
-      SELECT id, run_id, name
-      FROM entries
-      WHERE run_id = ?
-      ORDER BY id
-    `)
-    .bind(run.id);
-
-  try {
-    const batchResults = await db.batch<Entry>([
-      ...entries.map((name) => insertEntry.bind(run.id, name)),
-      selectEntries
-    ]);
-
-    return {
-      ...run,
-      entries: batchResults[batchResults.length - 1].results,
-      eliminations: []
-    };
-  } catch (err) {
-    console.error("Problem inserting data:", err);
-    // Clean up the orphaned run if the entries batch failed
-    await db.prepare(`DELETE FROM runs WHERE id = ?`).bind(run.id).run();
-
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to create run entries."
-    });
-  }
+  return {
+    ...run,
+    entries: entriesRes!.results as Entry[],
+    eliminations: []
+  };
 });

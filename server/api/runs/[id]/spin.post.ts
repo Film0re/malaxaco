@@ -1,114 +1,103 @@
+import * as v from "valibot";
+import { RunIdParams } from "#shared/schemas/run";
+import { getUser } from "~~/server/utils/auth";
 import { useDB } from "~~/server/utils/db";
 
+const notFound = () => createError({ statusCode: 404, statusMessage: "Run not found." });
+
 export default defineEventHandler(async (event): Promise<SpinResult> => {
-  const db = useDB(event);
-
-  const id = Number(getRouterParam(event, "id"));
-
-  if (!Number.isInteger(id)) {
-    throw createError({ statusCode: 400, statusMessage: "Invalid run ID." });
-  }
+  const { id } = await getValidatedRouterParams(event, (p) => v.parse(RunIdParams, p));
 
   // A spin only makes sense on a run you already own, so no guest creation here.
   const user = await getUser(event);
-
   if (!user) {
-    throw createError({ statusCode: 404, statusMessage: "Run not found." });
+    throw notFound();
   }
 
-  const run = await db
-    .prepare(`
-      SELECT id, started_at, finished_at
-      FROM runs
-      WHERE id = ? AND user_id = ?
-    `)
-    .bind(id, user.id)
-    .first<Run>();
+  const db = useDB(event);
 
-  if (!run) {
-    throw createError({ statusCode: 404, statusMessage: "Run not found." });
-  }
-
-  if (run.finished_at !== null) {
-    throw createError({
-      statusCode: 409,
-      statusMessage: "This run has already finished."
-    });
-  }
-
+  // Ownership, "not finished", and "never eliminate the last entry" are all
+  // enforced inside the statement, so nothing can slip in between a check and the write.
   const eliminate = db
     .prepare(`
       INSERT INTO eliminations (run_id, entry_id, spin_number)
       SELECT
-        ?,
-        entry.id,
-        COALESCE(
-          (SELECT MAX(spin_number) FROM eliminations WHERE run_id = ?),
-          0
-        ) + 1
-      FROM entries AS entry
-      WHERE entry.run_id = ?
+        r.id,
+        e.id,
+        COALESCE((SELECT MAX(spin_number) FROM eliminations WHERE run_id = r.id), 0) + 1
+      FROM runs r
+      JOIN entries e ON e.run_id = r.id
+      WHERE r.id = ?1
+        AND r.user_id = ?2
+        AND r.finished_at IS NULL
         AND NOT EXISTS (
-          SELECT 1
-          FROM eliminations
-          WHERE eliminations.run_id = ?
-            AND eliminations.entry_id = entry.id
+          SELECT 1 FROM eliminations x WHERE x.run_id = r.id AND x.entry_id = e.id
         )
+        AND (SELECT COUNT(*) FROM entries WHERE run_id = r.id)
+          - (SELECT COUNT(*) FROM eliminations WHERE run_id = r.id) > 1
       ORDER BY RANDOM()
       LIMIT 1
       RETURNING id, run_id, entry_id, spin_number, created_at
     `)
-    .bind(id, id, id, id);
+    .bind(id, user.id);
 
-  // Runs after the insert within the same transaction, so it sees the new elimination
   const finishIfDone = db
     .prepare(`
-    UPDATE runs
-    SET finished_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
-    WHERE id = ?
-      AND finished_at IS NULL
-      AND (SELECT COUNT(*) FROM entries WHERE run_id = ?)
-        - (SELECT COUNT(*) FROM eliminations WHERE run_id = ?) = 1
-  `)
-    .bind(id, id, id);
+      UPDATE runs
+      SET finished_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+      WHERE id = ?1
+        AND user_id = ?2
+        AND finished_at IS NULL
+        AND (SELECT COUNT(*) FROM entries WHERE run_id = ?1)
+          - (SELECT COUNT(*) FROM eliminations WHERE run_id = ?1) = 1
+    `)
+    .bind(id, user.id);
 
+  // Scoped by owner too: this batch no longer relies on a pre-check.
   const selectRemaining = db
     .prepare(`
-      SELECT id, run_id, name
-      FROM entries
-      WHERE run_id = ?
+      SELECT e.id, e.run_id, e.name
+      FROM entries e
+      JOIN runs r ON r.id = e.run_id
+      WHERE r.id = ?1
+        AND r.user_id = ?2
         AND NOT EXISTS (
-          SELECT 1
-          FROM eliminations
-          WHERE eliminations.run_id = ?
-            AND eliminations.entry_id = entries.id
+          SELECT 1 FROM eliminations x WHERE x.run_id = e.run_id AND x.entry_id = e.id
         )
-      ORDER BY id
+      ORDER BY e.id
     `)
-    .bind(id, id);
+    .bind(id, user.id);
 
   let results;
   try {
     results = await db.batch([eliminate, finishIfDone, selectRemaining]);
   } catch (err) {
-    console.error(err);
-    // Most likely a UNIQUE violation from a concurrent spin
-    throw createError({
-      statusCode: 409,
-      statusMessage: "Spin conflict, try again."
-    });
+    if (String((err as Error)?.message ?? err).includes("UNIQUE constraint failed")) {
+      throw createError({ statusCode: 409, statusMessage: "Spin conflict, try again." });
+    }
+    throw err; // real failures stay 500s
   }
 
-  const elimination = (results[0].results as Elimination[])[0];
+  const elimination = results[0]!.results[0] as Elimination | undefined;
 
   if (!elimination) {
+    // Nothing was eliminated: work out why (only on this failure path).
+    const run = await db
+      .prepare(`SELECT finished_at FROM runs WHERE id = ?1 AND user_id = ?2`)
+      .bind(id, user.id)
+      .first<{ finished_at: string | null }>();
+
+    if (!run) {
+      throw notFound();
+    }
+
     throw createError({
       statusCode: 409,
-      statusMessage: "This run cannot be spun."
+      statusMessage: run.finished_at ? "This run has already finished." : "This run cannot be spun."
     });
   }
 
-  const remaining = results[2].results as Entry[];
+  const remaining = results[2]!.results as Entry[];
 
   return {
     elimination,
