@@ -23,16 +23,27 @@
 </template>
 
 <script setup lang="ts">
+import { CreateRunSchema } from "#shared/schemas/run";
+import * as v from "valibot";
+
 const text = ref("");
 const attempted = ref(false);
 const serverError = ref("");
 const creating = ref(false);
 const input = useTemplateRef<HTMLTextAreaElement>("input");
 
-const validation = computed(() => validateEntries(text.value.split("\n")));
+const entries = computed(() =>
+  text.value
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean)
+);
 
-const entries = computed(() => validation.value.entries);
-const validationError = computed(() => validation.value.error);
+const validation = computed(() => v.safeParse(CreateRunSchema, { entries: entries.value }));
+
+const validationError = computed(() =>
+  validation.value.success ? "" : validation.value.issues[0]!.message
+);
 
 // Validation errors only show after a submit attempt, then update live as you type.
 // Server errors show until the next submit.

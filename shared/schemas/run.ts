@@ -11,7 +11,7 @@ export const CreateRunSchema = v.object({
       )
     ),
     v.minLength(2, "Add at least two entries"),
-    v.maxLength(100, "At most 100 entries")
+    v.maxLength(30, "At most 30 entries")
   )
 });
 
