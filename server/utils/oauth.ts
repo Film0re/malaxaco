@@ -26,20 +26,22 @@ export async function completeOAuthLogin(event: H3Event, profile: OAuthProfile) 
     .bind(profile.provider, profile.providerId)
     .first<{ user_id: number }>();
 
-  // Fill gaps and refresh the avatar, but never overwrite a name the user chose.
-  const updateProfile = (id: number) =>
+  const promoteProfile = (id: number) =>
     db
       .prepare(`
       UPDATE users
       SET name = COALESCE(name, ?1), email = COALESCE(email, ?2),
           avatar_url = COALESCE(?3, avatar_url)
-      WHERE id = ?4
+      WHERE id = ?4 AND ${noLogin(4)}
       RETURNING id, name, avatar_url`)
       .bind(name, email, avatarUrl, id);
 
-  const link = (userId: number) =>
+  const linkGuest = (userId: number) =>
     db
-      .prepare(`INSERT INTO oauth_accounts (provider, provider_id, user_id) VALUES (?1, ?2, ?3)`)
+      .prepare(`
+      INSERT INTO oauth_accounts (provider, provider_id, user_id)
+      SELECT ?1, ?2, ?3
+      WHERE EXISTS (SELECT 1 FROM users WHERE id = ?3) AND ${noLogin(3)}`)
       .bind(profile.provider, profile.providerId, userId);
 
   // The first statement in every plan returns the user row.
@@ -47,11 +49,11 @@ export async function completeOAuthLogin(event: H3Event, profile: OAuthProfile) 
 
   if (existing) {
     statements = [
-      updateProfile(existing.user_id),
+      promoteProfile(existing.user_id),
       ...(guestId && guestId !== existing.user_id ? absorbGuest(db, guestId, existing.user_id) : [])
     ];
   } else if (guestId) {
-    statements = [updateProfile(guestId), link(guestId)];
+    statements = [promoteProfile(guestId), linkGuest(guestId)];
   } else {
     statements = [
       db
