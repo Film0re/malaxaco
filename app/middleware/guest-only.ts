@@ -1,6 +1,8 @@
+import { isSignedIn } from "~~/shared/auth";
+
 export default defineNuxtRouteMiddleware(() => {
   const { user } = useUserSession();
-  if (user.value && user.value.provider !== "guest") {
+  if (isSignedIn(user.value)) {
     return navigateTo("/");
   }
 });

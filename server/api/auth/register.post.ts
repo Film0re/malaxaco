@@ -1,12 +1,13 @@
 import * as v from "valibot";
 import { RegisterSchema } from "#shared/schemas/auth";
-import { getUser, ensureUser } from "~~/server/utils/auth";
+import { getUser, ensureUser, startSession } from "~~/server/utils/auth";
+import { isSignedIn } from "~~/shared/auth";
 
 export default defineEventHandler(async (event) => {
   const { username, password } = await readValidatedBody(event, (b) => v.parse(RegisterSchema, b));
 
   const current = await getUser(event);
-  if (current && current.provider !== "guest") {
+  if (current && isSignedIn(current)) {
     throw createError({ statusCode: 409, statusMessage: "Already signed in." });
   }
 
@@ -18,8 +19,8 @@ export default defineEventHandler(async (event) => {
     await db.batch([
       db.prepare(`UPDATE users SET name = ?1 WHERE id = ?2`).bind(username, guest.id),
       db
-        .prepare(`INSERT INTO credentials (user_id, username, password_hash) VALUES (?2, ?1, ?3)`)
-        .bind(username, guest.id, passwordHash)
+        .prepare(`INSERT INTO credentials (username, password_hash, user_id) VALUES (?1, ?2, ?3)`)
+        .bind(username, passwordHash, guest.id)
     ]);
   } catch (e) {
     if (String((e as Error)?.message ?? e).includes("UNIQUE constraint failed")) {
@@ -28,8 +29,6 @@ export default defineEventHandler(async (event) => {
     throw e;
   }
 
-  await setUserSession(event, {
-    user: { id: guest.id, name: username, provider: "credentials" }
-  });
+  await startSession(event, { id: guest.id, name: username }, "credentials");
   return { ok: true };
 });

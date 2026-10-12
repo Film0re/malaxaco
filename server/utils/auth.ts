@@ -2,7 +2,7 @@ import type { H3Event } from "h3";
 import type { User } from "#auth-utils";
 
 // True only if the user has no login method at all, i.e. is still a guest.
-const noLogin = (n: number) => `
+export const noLogin = (n: number) => `
   NOT EXISTS (SELECT 1 FROM oauth_accounts WHERE user_id = ?${n})
   AND NOT EXISTS (SELECT 1 FROM credentials WHERE user_id = ?${n})`;
 

@@ -27,12 +27,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Invalid username or password." });
   }
 
-  // Move the current guest's runs into this account, then remove the guest row.
-  const guestId = await getGuestId(event);
-  if (guestId && guestId !== row.id) {
-    await db.batch(absorbGuest(db, guestId, row.id));
-  }
-
   await startSession(event, row, "credentials");
   return { ok: true };
 });

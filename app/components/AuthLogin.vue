@@ -17,10 +17,12 @@
 </template>
 
 <script setup lang="ts">
+import { isSignedIn as _isSignedIn } from "~~/shared/auth";
+
 const { user, clear } = useUserSession();
 
 // Guests have a session but aren't signed in.
-const isSignedIn = computed(() => !!user.value && user.value.provider !== "guest");
+const isSignedIn = computed(() => _isSignedIn(user.value));
 
 async function logout() {
   await clear();

@@ -1,4 +1,3 @@
-```vue
 <template>
   <section class="mx-auto max-w-sm space-y-4 p-4">
     <h1 class="text-2xl font-bold">
@@ -12,12 +11,6 @@
         class="block rounded-lg border px-4 py-2 text-center text-sm font-medium hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:hover:bg-gray-800"
       >
         Continue with Google
-      </a>
-      <a
-        href="/auth/github"
-        class="block rounded-lg border px-4 py-2 text-center text-sm font-medium hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:hover:bg-gray-800"
-      >
-        Continue with GitHub
       </a>
     </div>
 
@@ -33,7 +26,7 @@
           autocomplete="username"
           :aria-invalid="!!errors.username"
           :aria-describedby="errors.username ? 'username-error' : undefined"
-          class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-[invalid=true]:border-red-600"
+          class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-invalid:border-red-600"
         />
         <ul v-if="errors.username" id="username-error" class="mt-1 space-y-1 text-sm text-red-600">
           <li v-for="message in errors.username" :key="message">
@@ -52,7 +45,7 @@
           :autocomplete="mode === 'login' ? 'current-password' : 'new-password'"
           :aria-invalid="!!errors.password"
           :aria-describedby="errors.password ? 'password-error' : undefined"
-          class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-[invalid=true]:border-red-600"
+          class="w-full rounded border p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-invalid:border-red-600"
         />
         <ul v-if="errors.password" id="password-error" class="mt-1 space-y-1 text-sm text-red-600">
           <li v-for="message in errors.password" :key="message">
@@ -161,4 +154,3 @@ async function submit() {
   }
 }
 </script>
-```
