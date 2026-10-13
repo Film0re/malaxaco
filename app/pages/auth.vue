@@ -4,7 +4,7 @@
       {{ mode === "login" ? "Sign in" : "Create account" }}
     </h1>
 
-    <p class="text-sm text-gray-600 dark:text-gray-300">Your current runs will be kept.</p>
+    <p class="text-sm text-gray-600 dark:text-gray-500">Your current runs will be kept.</p>
 
     <div>
       <a
