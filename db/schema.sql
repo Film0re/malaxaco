@@ -5,7 +5,6 @@ CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
     name TEXT UNIQUE COLLATE NOCASE,
-    email TEXT,
     avatar_url TEXT,
 
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
