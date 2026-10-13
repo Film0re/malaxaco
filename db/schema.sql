@@ -25,19 +25,6 @@ CREATE TABLE oauth_accounts (
         ON DELETE CASCADE
 ) STRICT;
 
--- Login method: username/password. At most one per user.
-CREATE TABLE credentials (
-    user_id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE COLLATE NOCASE,
-    password_hash TEXT NOT NULL,
-
-    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
-
-    FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
-) STRICT;
-
 CREATE TABLE runs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 

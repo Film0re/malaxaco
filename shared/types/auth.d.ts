@@ -1,4 +1,3 @@
-// auth.d.ts
 import type { OAuthProvider } from "#shared/auth";
 
 declare module "#auth-utils" {
@@ -6,7 +5,7 @@ declare module "#auth-utils" {
     id: number;
     name: string | null;
     avatarUrl?: string;
-    provider: OAuthProvider | "guest" | "credentials";
+    provider: OAuthProvider | "guest";
   }
 }
 export {};
