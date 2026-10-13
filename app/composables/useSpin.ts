@@ -1,4 +1,3 @@
-// app/composables/useSpin.ts
 export function useSpin(runId: string | number, refresh: () => Promise<unknown>) {
   const spinning = ref(false);
   const error = ref("");

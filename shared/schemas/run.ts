@@ -32,5 +32,3 @@ export const PageQuery = v.object({
     "1" // default applies before the pipe, so it's coerced to 1 as well
   )
 });
-
-export type CreateRunRequest = v.InferOutput<typeof CreateRunSchema>;
