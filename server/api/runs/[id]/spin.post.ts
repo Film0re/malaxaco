@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<SpinResult> => {
   // A spin only makes sense on a run you already own, so no guest creation here.
   const user = await getUser(event);
   if (!user) {
-    throw notFound();
+    throw createError({ statusCode: 401, statusMessage: "Sign in required." });
   }
 
   const db = useDB(event);

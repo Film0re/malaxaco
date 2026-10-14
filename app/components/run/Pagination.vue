@@ -2,7 +2,7 @@
   <nav v-if="totalPages > 1" class="flex items-center justify-center gap-1" aria-label="Pagination">
     <NuxtLink
       v-if="page > 1"
-      :to="{ query: { page: page - 1 } }"
+      :to="pageTo(page - 1)"
       class="rounded-lg px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
     >
       ← Prev
@@ -13,7 +13,7 @@
 
       <NuxtLink
         v-else
-        :to="{ query: { page: item } }"
+        :to="pageTo(item)"
         class="rounded-lg px-3 py-2 text-sm"
         :class="
           item === page
@@ -28,7 +28,7 @@
 
     <NuxtLink
       v-if="page < totalPages"
-      :to="{ query: { page: page + 1 } }"
+      :to="pageTo(page + 1)"
       class="rounded-lg px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
     >
       Next →
@@ -38,6 +38,9 @@
 
 <script setup lang="ts">
 const props = defineProps<{ page: number; totalPages: number }>();
+const route = useRoute();
+
+const pageTo = (page: number) => ({ query: { ...route.query, page } });
 
 // First, last, and the current page with one neighbour each side,
 // with "…" filling any gaps.

@@ -11,6 +11,20 @@ export interface RunPage {
   total: number;
 }
 
+export type RunAction = "spin" | "eliminate" | "finish";
+
+export type RunOwnership = Pick<Run, "finished_at"> & { user_id: number };
+
+export interface RunDetails extends Run {
+  actions: RunAction[];
+  entries: Entry[];
+  eliminations: Elimination[];
+}
+
+export interface CreateRunRequest {
+  entries: string[];
+}
+
 export interface Entry {
   id: number;
   run_id: number;
@@ -23,15 +37,6 @@ export interface Elimination {
   entry_id: number;
   spin_number: number;
   created_at: string;
-}
-
-export interface RunDetails extends Run {
-  entries: Entry[];
-  eliminations: Elimination[];
-}
-
-export interface CreateRunRequest {
-  entries: string[];
 }
 
 export interface SpinResult {

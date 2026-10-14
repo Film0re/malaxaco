@@ -1,4 +1,3 @@
-// server/api/runs.post.ts
 import * as v from "valibot";
 import { CreateRunSchema } from "#shared/schemas/run";
 
@@ -46,6 +45,7 @@ export default defineEventHandler(async (event): Promise<RunDetails> => {
 
   return {
     ...run,
+    actions: runActions(user, { user_id: user.id, finished_at: run.finished_at }),
     entries: entriesRes!.results as Entry[],
     eliminations: []
   };

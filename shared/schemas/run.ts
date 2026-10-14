@@ -30,5 +30,12 @@ export const PageQuery = v.object({
       v.maxValue(100_000)
     ),
     "1" // default applies before the pipe, so it's coerced to 1 as well
+  ),
+  mine: v.optional(
+    v.pipe(
+      v.picklist(["0", "1"]),
+      v.transform((x) => x === "1")
+    ),
+    "0" // same deal: coerced to false
   )
 });

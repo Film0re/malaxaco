@@ -26,16 +26,7 @@
           @done="onDone"
         />
 
-        <button
-          v-if="!replaying"
-          :disabled="spinning"
-          class="rounded bg-black px-6 py-3 text-white disabled:opacity-50"
-          @click="spin"
-        >
-          {{ spinning ? "Spinning..." : "Spin" }}
-        </button>
-
-        <div v-else class="flex flex-wrap items-center gap-3">
+        <div v-if="replaying" class="flex flex-wrap items-center gap-3">
           <button v-if="paused" class="rounded bg-black px-6 py-3 text-white" @click="resumeReplay">
             ▶ Resume
           </button>
@@ -44,6 +35,17 @@
           </button>
           <button class="rounded border px-6 py-3" @click="stopReplay">Stop replay</button>
         </div>
+
+        <button
+          v-else-if="can('spin')"
+          :disabled="spinning"
+          class="rounded bg-black px-6 py-3 text-white disabled:opacity-50"
+          @click="spin"
+        >
+          {{ spinning ? "Spinning..." : "Spin" }}
+        </button>
+
+        <p v-else class="text-sm text-gray-500">Only the owner can spin this run.</p>
 
         <p v-if="paused" class="text-sm text-gray-500">
           Paused. Pick a different animation, then resume.
@@ -77,6 +79,7 @@ import { useReplay } from "#imports";
 const id = useRoute().params.id as string;
 
 const { data: run, error: loadError, refresh } = await useFetch<RunDetails>(`/api/runs/${id}`);
+const { can } = useRunActions(run);
 
 const { remaining, eliminated, winner } = useRunProgress(run);
 const variant = useSpinnerVariant();
