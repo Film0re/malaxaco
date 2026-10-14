@@ -9,7 +9,7 @@ A full-stack web app built with **Nuxt 4** and deployed to **Cloudflare Pages**,
 - Add profile page to allow for deletion of users and their data [  ]
 - Clean up the mess I've made [  ]
 - Allow for merging guest spins as optional when signing up [  ]
-- 
+- Allow stims to be broken up even further (Ie. not just concatenation but jumbling of the two)
 
 ## Tech stack
 
