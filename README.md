@@ -1,4 +1,5 @@
 # Malaxaco
+
 Just a dumb site I decided to make based on a whim
 
 Live site: https://www.malaxaco.com/
@@ -6,22 +7,23 @@ Live site: https://www.malaxaco.com/
 A full-stack web app built with **Nuxt 4** and deployed to **Cloudflare Pages**, using **Cloudflare D1** (SQLite) for storage.
 
 ## TODO's
-- Add profile page to allow for deletion of users and their data [  ]
-- Clean up the mess I've made [  ]
-- Allow for merging guest spins as optional when signing up [  ]
+
+- Add profile page to allow for deletion of users and their data [ ]
+- Clean up the mess I've made [ ]
+- Allow for merging guest spins as optional when signing up [ ]
 - Allow stims to be broken up even further (Ie. not just concatenation but jumbling of the two)
 
 ## Tech stack
 
-| Layer | Tool |
-| --- | --- |
-| Framework | [Nuxt 4](https://nuxt.com) (Vue 3, Vue Router, Nitro server) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com) via `@tailwindcss/vite` |
-| Language | TypeScript (type-checked with `vue-tsc`) |
-| Auth | [`nuxt-auth-utils`](https://github.com/atinux/nuxt-auth-utils) |
-| Database | Cloudflare D1, bound as `DB` |
-| Hosting | Cloudflare Pages, managed with `wrangler` |
-| Lint / format | [oxlint](https://oxc.rs) / oxfmt |
+| Layer         | Tool                                                               |
+| ------------- | ------------------------------------------------------------------ |
+| Framework     | [Nuxt 4](https://nuxt.com) (Vue 3, Vue Router, Nitro server)       |
+| Styling       | [Tailwind CSS v4](https://tailwindcss.com) via `@tailwindcss/vite` |
+| Language      | TypeScript (type-checked with `vue-tsc`)                           |
+| Auth          | [`nuxt-auth-utils`](https://github.com/atinux/nuxt-auth-utils)     |
+| Database      | Cloudflare D1, bound as `DB`                                       |
+| Hosting       | Cloudflare Pages, managed with `wrangler`                          |
+| Lint / format | [oxlint](https://oxc.rs) / oxfmt                                   |
 
 ## Getting started
 
@@ -57,17 +59,17 @@ npm run dev          # http://localhost:3000
 
 ## Scripts
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Start the Nuxt dev server on `localhost:3000` |
-| `npm run build` | Production build |
-| `npm run generate` | Static site generation |
-| `npm run preview` | Build, then run the result locally with `wrangler pages dev` (closest to production) |
-| `npm run deploy` | Build with the `cloudflare_pages` preset and deploy `dist/` via Wrangler |
-| `npm run cf-typegen` | Regenerate Cloudflare binding types (`worker-configuration.d.ts`) |
-| `npm run db:schema` | Apply `db/schema.sql` to the **local** D1 database |
-| `npm run db:seed` | Apply `db/seed.sql` to the **local** D1 database |
-| `npm run db:reset` | Wipe local D1 state (`.wrangler/state`), then re-run schema and seed |
+| Command              | What it does                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| `npm run dev`        | Start the Nuxt dev server on `localhost:3000`                                        |
+| `npm run build`      | Production build                                                                     |
+| `npm run generate`   | Static site generation                                                               |
+| `npm run preview`    | Build, then run the result locally with `wrangler pages dev` (closest to production) |
+| `npm run deploy`     | Build with the `cloudflare_pages` preset and deploy `dist/` via Wrangler             |
+| `npm run cf-typegen` | Regenerate Cloudflare binding types (`worker-configuration.d.ts`)                    |
+| `npm run db:schema`  | Apply `db/schema.sql` to the **local** D1 database                                   |
+| `npm run db:seed`    | Apply `db/seed.sql` to the **local** D1 database                                     |
+| `npm run db:reset`   | Wipe local D1 state (`.wrangler/state`), then re-run schema and seed                 |
 
 Linting and formatting have no npm scripts yet, so run the tools directly:
 
@@ -90,7 +92,6 @@ wrangler.jsonc          Cloudflare config: project name, D1 binding
 worker-configuration.d.ts   Generated binding types (don't edit by hand; run `npm run cf-typegen`)
 env.d.ts                Extra ambient type declarations
 ```
-
 
 ## Working with the database
 
@@ -138,6 +139,3 @@ Production secrets (such as `NUXT_SESSION_PASSWORD`) are **not** read from `.env
 1. Branch off `main`.
 2. Make your change, and run lint, format, and type-check (see [Scripts](#scripts)).
 3. Throw up a PR brother, maybe one day I'll setup proper CI
-
-
-
