@@ -12,7 +12,10 @@
 		"cf-typegen": "wrangler types",
 		"db:schema": "wrangler d1 execute malaxaco-db --local --file=./db/schema.sql",
 		"db:seed": "wrangler d1 execute malaxaco-db --local --file=./db/seed.sql",
-		"db:reset": "rm -rf .wrangler/state && npm run db:schema && npm run db:seed"
+		"db:reset": "rm -rf .wrangler/state && npm run db:schema && npm run db:seed",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix"
+		
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.1.17",
